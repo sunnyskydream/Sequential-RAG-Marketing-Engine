@@ -1,4 +1,4 @@
-**🚀 Sequential RAG Engine**\
+**🚀 Sequential RAG Marketing Engine**\
 AI-powered personalization engine combining clickstream + demographic data for intent-aware marketing
 
 📌 Overview\
