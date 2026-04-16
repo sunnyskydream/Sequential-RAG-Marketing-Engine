@@ -27,6 +27,7 @@ Vector Database (Supabase)\
 Retrieval (Relevant Context)\
         ↓\
 RAG (Content Generation)
+<img width="1536" height="1024" alt="RAG marketing engine" src="https://github.com/user-attachments/assets/a118d70d-9139-47bb-ab78-1649b8a85652" />
 
 📊 Dataset\
 Clickstream Data (Source: Kaggle E-commerce customer journey dataset)\
