@@ -95,7 +95,7 @@ Reduces manual segmentation effort
 Synthetic demographic data\
 No real-time streaming pipeline\
 UI layer (Streamlit) not deployed in current version\
-Embedding model optimized for cost over accuracy\
+Embedding model optimized for cost over accuracy
 
 🔮 Future Improvements\
 Deploy full UI (Streamlit / web app)\
@@ -108,3 +108,4 @@ Prompt optimization & evaluation
 Prototyped in Google Colab due to local environment dependency constraints\
 Streamlit UI was initially planned for interactive simulation, but not fully implemented due to package compatibility limitations in Colab\
 Current version focuses on core RAG pipeline and personalization logic
+Update to GA4 MCP for live-stream, dynamic, agentic workflow
