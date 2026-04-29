@@ -148,3 +148,17 @@ GA4 MCP integration for live agentic workflows
 Original prototype built in Google Colab — see `Sequential_RAG_Marketing_Engine.ipynb`\
 Local version replaces Supabase/pgvector with an in-memory NumPy store for zero-config setup\
 API key is entered at runtime via the Streamlit sidebar and is never stored in code
+
+
+📋 What Changed in This Version
+
+| Section | Before | After |
+| --- | --- | --- |
+| Key Features | "notebook environment" | Streamlit UI with 3 tabs |
+| Architecture | Supabase vector DB | In-memory NumPy cosine similarity |
+| Dataset | Kaggle (requires account) | Synthetic local data, no account needed |
+| Tech Stack | Supabase + Google Colab | In-memory store + local Streamlit |
+| Quick Start | *(not present)* | Full install + run instructions added |
+| App Tab Guide | *(not present)* | Setup / Query / Explore tab table added |
+| Limitations | "UI not deployed" | Removed — UI is now live |
+| Dev Notes | Colab constraints | Colab notebook kept for reference |
