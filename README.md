@@ -13,32 +13,69 @@ Campaign messaging.
 
 🎯 Key Features\
 🔍 Semantic user representation via embeddings\
-⚡ Vector-based retrieval of user context\
+⚡ In-memory vector retrieval — no cloud database required\
 ✨ RAG-based personalized content generation\
-🧪 Interactive prototyping via notebook environment\
+🖥️ Interactive Streamlit UI with Setup, Query, and Explore tabs\
+🧪 Original prototyping notebook included for reference
+
 
 🏗️ Architecture\
-User Data (Clickstream + Demographics)\
+User Data (Synthetic Clickstream + Demographics)\
         ↓\
-Embedding Layer (OpenAI)\
+Semantic Stringification\
         ↓\
-Vector Database (Supabase)\
+Embedding Layer (OpenAI text-embedding-3-small)\
         ↓\
-Retrieval (Relevant Context)\
+In-Memory Vector Store (NumPy cosine similarity)\
         ↓\
-RAG (Content Generation)
+Retrieval (Relevant User Context)\
+        ↓\
+RAG Content Generation (GPT-4o)
 <img width="1536" height="1024" alt="RAG marketing engine" src="https://github.com/user-attachments/assets/a118d70d-9139-47bb-ab78-1649b8a85652" />
 
 📊 Dataset\
-Clickstream Data (Source: Kaggle E-commerce customer journey dataset)\
-Demographic Data (Synthesized and joined via user_id
-Simulates CDP-like user profiles)\
+Clickstream Data: Synthetic data generated locally — mirrors the structure of the Kaggle E-commerce Customer Journey dataset (no Kaggle account required)\
+Demographic Data: Synthesized and joined via user_id, simulating CDP-like user profiles
+
 
 🛠️ Tech Stack\
-Embeddings: OpenAI (text-embedding-3-small)\
-Vector DB: Supabase\
-Prototyping: Google Colab\
+Embeddings: OpenAI text-embedding-3-small\
+Vector Store: In-memory NumPy cosine similarity (replaces Supabase/pgvector)\
+UI: Streamlit (local)\
 Language: Python
+
+
+⚡ Quick Start
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/sunnyskydream/Sequential-RAG-Marketing-Engine.git
+cd Sequential-RAG-Marketing-Engine
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Set your OpenAI API key
+cp .env.example .env
+# Edit .env and replace the placeholder with your real key
+
+# 4. Launch the app
+streamlit run app.py
+```
+
+Open http://localhost:8501 in your browser.
+
+**API key:** you can also skip the `.env` step and paste your key directly into the sidebar when the app loads.
+
+
+🖥️ Using the App
+
+| Tab | What it does |
+| --- | --- |
+| ⚙️ Setup & Index | Generate synthetic users → embed their profiles into the vector store |
+| 🔍 Query & Generate | Describe a user's behavior → retrieve similar profiles → generate Corsair marketing copy |
+| 📊 Explore Data | Browse demographics, clickstream events, and semantic context strings |
+
 
 💡 Example Use Case\
 Input:\
@@ -49,19 +86,20 @@ Output:\
 Tailored product recommendation\
 Intent-aware messaging (exploration vs purchase stage)
 
+
 ⚡ Before vs After: Traditional vs AI-Driven Personalization\
 ❌ Traditional Marketing (Static Segmentation)\
 Approach:\
 Define audience rules manually\
-“Female, 30–50, high income”\
+"Female, 30–50, high income"\
 Pre-write fixed messaging\
-Apply same content to entire segment\
+Apply same content to entire segment
 
 Limitations\
 Ignores real-time behavior\
 Slow to update\
 Requires manual campaign setup\
-Low personalization depth\
+Low personalization depth
 
 ✅ AI-Driven (RAG-Based Personalization)\
 Approach:\
@@ -79,33 +117,34 @@ Reduces manual segmentation effort
 🔍 Example Comparison
 | Scenario                                   | Traditional Output               | RAG-Based Output                                                         |
 | ------------------------------------------ | -------------------------------- | ------------------------------------------------------------------------ |
-| High-income user browsing premium products | Generic “Explore our collection” | “Upgrade your setup with premium performance designed for professionals” |
+| High-income user browsing premium products | Generic "Explore our collection" | "Upgrade your setup with premium performance designed for professionals" |
 | User early in journey                      | Same promo messaging             | Educational / discovery-focused messaging                                |
 | User near conversion                       | Same messaging                   | Urgency + product-specific recommendation                                |
 
 
 🧠 Key Takeaway\
 👉 Traditional marketing asks:
-“Which segment does this user belong to?”\
+"Which segment does this user belong to?"\
 👉 This system asks:
-“What is this user trying to do right now?”
+"What is this user trying to do right now?"
 
 
 ⚠️ Limitations\
-Synthetic demographic data\
+Synthetic demographic data (no real CDP integration)\
 No real-time streaming pipeline\
-UI layer (Streamlit) not deployed in current version\
-Embedding model optimized for cost over accuracy
+In-memory vector store resets on app restart (not persistent)\
+Embedding model optimized for cost over maximum accuracy
+
 
 🔮 Future Improvements\
-Deploy full UI (Streamlit / web app)\
 Real-time event streaming integration\
 CDP integration\
-Advanced vector DB scaling\
-Prompt optimization & evaluation
+Persistent vector database (e.g. Supabase, Pinecone)\
+Advanced prompt optimization & evaluation\
+GA4 MCP integration for live agentic workflows
+
 
 ⚙️ Development Notes\
-Prototyped in Google Colab due to local environment dependency constraints\
-Streamlit UI was initially planned for interactive simulation, but not fully implemented due to package compatibility limitations in Colab\
-Current version focuses on core RAG pipeline and personalization logic\
-Update to GA4 MCP for live-stream, dynamic, agentic workflow
+Original prototype built in Google Colab — see `Sequential_RAG_Marketing_Engine.ipynb`\
+Local version replaces Supabase/pgvector with an in-memory NumPy store for zero-config setup\
+API key is entered at runtime via the Streamlit sidebar and is never stored in code
