@@ -70,9 +70,7 @@ Open http://localhost:8501 in your browser.
 
 🎬 Demo
 
-<video src="RAG%20demo.mp4" width="100%" controls title="Sequential RAG Marketing Engine Demo"></video>
-
-> [▶️ Click here to watch the demo](RAG%20demo.mp4) if the video does not render above.
+[![Watch the demo on YouTube](https://img.youtube.com/vi/Q7uzjmP-3u0/maxresdefault.jpg)](https://youtu.be/Q7uzjmP-3u0)
 
 
 🖥️ Using the App
@@ -149,6 +147,17 @@ CDP integration\
 Persistent vector database (e.g. Supabase, Pinecone)\
 Advanced prompt optimization & evaluation\
 GA4 MCP integration for live agentic workflows
+
+
+🤖 Built with AI Assistance
+
+This project was developed collaboratively with three AI tools, each contributing at different stages:
+
+| AI | Role |
+| --- | --- |
+| **Google Gemini** | Early ideation and architecture design for the Colab prototype |
+| **ChatGPT (GPT-4o)** | Initial Colab script development and pipeline structuring |
+| **Claude (Anthropic)** | Refactoring into a local Streamlit app, brand-agnostic generalization, and code quality improvements |
 
 
 ⚙️ Development Notes\
