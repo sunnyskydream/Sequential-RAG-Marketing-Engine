@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import random
 from datetime import datetime, timedelta
-from typing import Callable, Optional
+from typing import Callable, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -18,14 +18,20 @@ import pandas as pd
 
 # ── Data generation ──────────────────────────────────────────────────────────
 
-def generate_synthetic_clickstream(n_users: int = 200, seed: int = 42) -> pd.DataFrame:
+def generate_synthetic_clickstream(
+    n_users: int = 200,
+    seed: int = 42,
+    categories: Optional[List[str]] = None,
+) -> pd.DataFrame:
     """Generate synthetic e-commerce clickstream data mimicking the Kaggle dataset."""
     random.seed(seed)
     np.random.seed(seed)
 
     devices = ["Desktop", "Mobile", "Tablet"]
     stages = ["Awareness", "Consideration", "Purchase Intent", "Conversion"]
-    categories = ["Gaming Peripherals", "Office Equipment", "Networking", "Cooling Solutions"]
+    product_categories = categories or [
+        "Electronics", "Home & Lifestyle", "Fashion", "Sports & Outdoors", "Beauty & Health"
+    ]
 
     user_ids = [f"CUST_{i:04d}" for i in range(1, n_users + 1)]
     base_time = datetime(2025, 1, 1)
@@ -48,19 +54,23 @@ def generate_synthetic_clickstream(n_users: int = 200, seed: int = 42) -> pd.Dat
                     "journey_stage": random.choice(stages),
                     "session_duration_s": random.randint(60, 1800),
                     "pages_viewed": random.randint(1, 20),
-                    "category": random.choice(categories),
+                    "category": random.choice(product_categories),
                 }
             )
 
     return pd.DataFrame(rows)
 
 
-def generate_demographics(user_ids, seed: int = 42) -> pd.DataFrame:
+def generate_demographics(
+    user_ids,
+    seed: int = 42,
+    interests: Optional[List[str]] = None,
+) -> pd.DataFrame:
     """Generate synthetic user demographic profiles for the given user IDs."""
     random.seed(seed)
 
     income_levels = ["Low", "Medium", "High", "Ultra High"]
-    interests = ["Gaming", "DIY", "Professional", "Streaming", "Esports"]
+    primary_interests = interests or ["Lifestyle", "DIY", "Professional", "Fitness", "Tech"]
     genders = ["Male", "Female", "Non-binary"]
     locations = [
         "San Jose", "San Francisco", "New York",
@@ -77,7 +87,7 @@ def generate_demographics(user_ids, seed: int = 42) -> pd.DataFrame:
                 "location": random.choice(locations),
                 "annual_income": random.choice(income_levels),
                 "loyalty_score": random.randint(1, 10),
-                "primary_interest": random.choice(interests),
+                "primary_interest": random.choice(primary_interests),
             }
         )
     return pd.DataFrame(data)
@@ -213,15 +223,30 @@ def build_vector_store(
 
 # ── Content generation ────────────────────────────────────────────────────────
 
-def generate_marketing_content(context: str, client) -> str:
-    """Generate intent-aware Corsair marketing copy using GPT-4o."""
+def generate_marketing_content(
+    context: str,
+    client,
+    brand_name: str = "Our Brand",
+    brand_context: str = "",
+    product_categories: Optional[List[str]] = None,
+) -> str:
+    """Generate intent-aware personalized marketing copy using GPT-4o."""
+    category_hint = (
+        f"Product categories: {', '.join(product_categories)}. "
+        if product_categories
+        else ""
+    )
+    brand_description = (
+        f"{brand_context} " if brand_context else f"a brand called {brand_name}. "
+    )
+
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {
                 "role": "system",
                 "content": (
-                    "You are a seasoned senior digital marketing expert at Corsair, "
+                    f"You are a seasoned senior digital marketing expert at {brand_name}, "
                     "skilled at generating precise, behavior-driven personalized marketing content."
                 ),
             },
@@ -229,10 +254,11 @@ def generate_marketing_content(context: str, client) -> str:
                 "role": "user",
                 "content": (
                     f"Based on the profile of this similar user:\n\n{context}\n\n"
-                    "Generate the following three marketing outputs for Corsair:\n\n"
+                    f"Generate the following three marketing outputs for {brand_name} — {brand_description}"
+                    f"{category_hint}\n\n"
                     "1. **Email Subject Line** — A high click-rate subject tailored to this user's purchase intent.\n"
-                    "2. **Product Recommendation** — Recommend one specific Corsair product "
-                    "(e.g., keyboard, mouse, headset, cooling) with a brief rationale.\n"
+                    f"2. **Product Recommendation** — Recommend one specific {brand_name} product "
+                    "with a brief rationale.\n"
                     "3. **Call to Action (CTA)** — One compelling short copy line to convert this user.\n\n"
                     "Format your response with clear section headers."
                 ),

@@ -2,7 +2,7 @@
 app.py — Streamlit frontend for the Sequential RAG Marketing Engine.
 
 Workflow:
-  1. Setup tab  → generate synthetic data + build in-memory vector index
+  1. Setup tab  → configure brand, generate synthetic data + build in-memory vector index
   2. Query tab  → enter a user behavior description → retrieve similar users → GPT-4o marketing copy
   3. Explore tab → browse the raw demographics, clickstream, and semantic contexts
 """
@@ -44,7 +44,7 @@ for key in ("vector_store", "context_df", "demographics_df", "clickstream_df"):
 
 with st.sidebar:
     st.title("🚀 Sequential RAG\nMarketing Engine")
-    st.caption("Personalized Corsair marketing via behavior-aware RAG")
+    st.caption("Personalized marketing copy via behavior-aware RAG")
     st.divider()
 
     api_key = st.text_input(
@@ -53,6 +53,28 @@ with st.sidebar:
         type="password",
         placeholder="sk-...",
         help="Set OPENAI_API_KEY in a local .env file, or paste it here. Never committed to git.",
+    )
+
+    st.divider()
+    st.markdown("#### Brand Configuration")
+    brand_name = st.text_input(
+        "Brand Name",
+        value="",
+        placeholder="e.g. Corsair, Daily Brew Tea, Nike…",
+        help="The brand for which marketing copy will be generated.",
+    )
+    brand_context = st.text_area(
+        "Brand Context (optional)",
+        value="",
+        placeholder="e.g. A premium gaming peripherals brand known for high-performance keyboards, mice, and headsets.",
+        height=80,
+        help="A brief description of what this brand sells and who it's for. Improves copy quality.",
+    )
+    product_categories_raw = st.text_input(
+        "Product Categories (comma-separated, optional)",
+        value="",
+        placeholder="e.g. Keyboards, Mice, Headsets, Cooling",
+        help="Leave blank to use generic categories.",
     )
 
     st.divider()
@@ -67,7 +89,7 @@ with st.sidebar:
     else:
         st.info("No index built yet.\nSee the **Setup** tab.")
 
-# ── Helper ────────────────────────────────────────────────────────────────────
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
 def make_client() -> OpenAI:
     if not api_key:
@@ -75,10 +97,17 @@ def make_client() -> OpenAI:
         st.stop()
     return OpenAI(api_key=api_key)
 
+def parse_categories(raw: str) -> list[str]:
+    items = [c.strip() for c in raw.split(",") if c.strip()]
+    return items if items else []
+
+def effective_brand_name() -> str:
+    return brand_name.strip() if brand_name.strip() else "Our Brand"
+
 # ── Tabs ──────────────────────────────────────────────────────────────────────
 
-tab_setup, tab_query, tab_explore = st.tabs(
-    ["⚙️ Setup & Index", "🔍 Query & Generate", "📊 Explore Data"]
+tab_setup, tab_explore, tab_query = st.tabs(
+    ["⚙️ Setup & Index", "📊 Explore Data", "🔍 Query & Generate"]
 )
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -89,19 +118,30 @@ with tab_setup:
     st.header("Setup & Index")
     st.markdown(
         "**Step 1** generates synthetic users that mirror the Kaggle e-commerce "
-        "clickstream dataset (no Kaggle account needed). "
+        "clickstream dataset (no Kaggle account needed).\n\n"
         "**Step 2** embeds each user's semantic profile and builds an in-memory vector index."
     )
+
+    if brand_name.strip():
+        st.info(f"Brand: **{brand_name.strip()}** — copy will be tailored to this brand.")
+    else:
+        st.warning("No brand name set. Add one in the sidebar for tailored copy.")
 
     col_gen, col_idx = st.columns(2)
 
     # ── Step 1: generate data ──────────────────────────────────────────────
     with col_gen:
         if st.button("1️⃣  Generate Synthetic Data", use_container_width=True):
+            categories = parse_categories(product_categories_raw)
             with st.spinner(f"Generating {n_users} users…"):
-                clickstream_df = generate_synthetic_clickstream(n_users=n_users)
+                clickstream_df = generate_synthetic_clickstream(
+                    n_users=n_users,
+                    categories=categories if categories else None,
+                )
                 demographics_df = generate_demographics(
-                    clickstream_df["user_id"].unique(), seed=42
+                    clickstream_df["user_id"].unique(),
+                    seed=42,
+                    interests=categories if categories else None,
                 )
 
                 # One context row per user: their most recent clickstream event
@@ -170,18 +210,17 @@ with tab_query:
     if st.session_state.vector_store is None:
         st.warning("Build the vector index in the **Setup** tab first.")
     else:
-        # Preset queries taken directly from the notebook
         PRESETS: dict[str, str] = {
-            "Early Exploration — Gaming, Mobile, Low income": (
+            "Early Exploration — Mobile, Low income": (
                 "This is a 38-year-old Male living in New York "
-                "with a primary interest in Gaming and a Low income level. "
+                "with a primary interest in Lifestyle and a Low income level. "
                 "He is currently using a Mobile device and has been on this step "
                 "for approximately 2025-03-31 11:11:46 seconds. "
                 "Based on his behavior pattern, he is in the early exploration stage of product discovery."
             ),
-            "Consideration Stage — Gaming, Desktop, Medium income": (
+            "Consideration Stage — Desktop, Medium income": (
                 "This is a 29-year-old Male living in California "
-                "with a primary interest in Gaming and a Medium income level. "
+                "with a primary interest in Tech and a Medium income level. "
                 "He is currently using a Desktop device and has been on this step "
                 "for approximately 2025-04-10 20:45:12 seconds. "
                 "Based on his behavior pattern, he is comparing multiple products and reviewing "
@@ -195,16 +234,16 @@ with tab_query:
                 "Based on her behavior pattern, she has revisited the same product multiple times "
                 "and is checking pricing and reviews, indicating strong purchase intent."
             ),
-            "Ultra-High Income Prospect — Professional, Tablet": (
+            "Ultra-High Income Prospect — Tablet": (
                 "This is a 40-year-old Female living in San Francisco "
                 "with a primary interest in Professional use and an Ultra High income level. "
                 "She is currently using a Tablet device and has been on this step "
                 "for approximately 2025-02-26 12:57:10 seconds. "
                 "Based on her behavior pattern, she is in the early exploration stage of product discovery."
             ),
-            "Esports Enthusiast — Desktop, High income, Conversion-ready": (
+            "Enthusiast — Desktop, High income, Conversion-ready": (
                 "This is a 24-year-old Male living in Seattle "
-                "with a primary interest in Esports and a High income level. "
+                "with a primary interest in Fitness and a High income level. "
                 "He is currently using a Desktop device and has been on this step "
                 "for approximately 2025-06-05 18:22:33 seconds. "
                 "Based on his behavior pattern, he is completing a purchase transaction, "
@@ -229,6 +268,7 @@ with tab_query:
         run_disabled = not query_text.strip()
         if st.button("🔍  Search & Generate", type="primary", disabled=run_disabled):
             client = make_client()
+            categories = parse_categories(product_categories_raw)
 
             with st.spinner("Vectorizing query and searching index…"):
                 try:
@@ -260,10 +300,17 @@ with tab_query:
 
                         if i == 0:
                             st.markdown("---")
-                            with st.spinner("Generating Corsair marketing copy via GPT-4o…"):
+                            bname = effective_brand_name()
+                            with st.spinner(f"Generating {bname} marketing copy via GPT-4o…"):
                                 try:
-                                    advice = generate_marketing_content(match["content"], client)
-                                    st.markdown("#### Corsair AI Marketing Recommendations")
+                                    advice = generate_marketing_content(
+                                        context=match["content"],
+                                        client=client,
+                                        brand_name=bname,
+                                        brand_context=brand_context.strip(),
+                                        product_categories=categories if categories else None,
+                                    )
+                                    st.markdown(f"#### {bname} AI Marketing Recommendations")
                                     st.markdown(advice)
                                 except Exception as exc:
                                     st.error(f"Content generation error: {exc}")
@@ -286,7 +333,6 @@ with tab_explore:
             df_d = st.session_state.demographics_df
             st.caption(f"{len(df_d)} users")
 
-            # Summary charts
             col_a, col_b, col_c = st.columns(3)
             with col_a:
                 st.bar_chart(df_d["gender"].value_counts(), use_container_width=True)

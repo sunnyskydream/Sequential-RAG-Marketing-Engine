@@ -68,13 +68,20 @@ Open http://localhost:8501 in your browser.
 **API key:** you can also skip the `.env` step and paste your key directly into the sidebar when the app loads.
 
 
+🎬 Demo
+
+<video src="RAG%20demo.mp4" width="100%" controls title="Sequential RAG Marketing Engine Demo"></video>
+
+> [▶️ Click here to watch the demo](RAG%20demo.mp4) if the video does not render above.
+
+
 🖥️ Using the App
 
 | Tab | What it does |
 | --- | --- |
-| ⚙️ Setup & Index | Generate synthetic users → embed their profiles into the vector store |
-| 🔍 Query & Generate | Describe a user's behavior → retrieve similar profiles → generate Corsair marketing copy |
+| ⚙️ Setup & Index | Configure your brand → generate synthetic users → embed their profiles into the vector store |
 | 📊 Explore Data | Browse demographics, clickstream events, and semantic context strings |
+| 🔍 Query & Generate | Describe a user's behavior → retrieve similar profiles → generate tailored marketing copy |
 
 
 💡 Example Use Case\
@@ -152,6 +159,19 @@ API key is entered at runtime via the Streamlit sidebar and is never stored in c
 
 📋 What Changed in This Version
 
+**v2 — Brand-Agnostic Update (May 2025)**
+
+| Area | Change |
+| --- | --- |
+| Brand configuration | Sidebar now accepts any brand name, brand context description, and product categories — no longer hardcoded to Corsair |
+| Copy generation | `generate_marketing_content()` takes `brand_name`, `brand_context`, and `product_categories` as inputs; GPT-4o tailors all copy to the specified brand |
+| Synthetic data | `generate_synthetic_clickstream()` and `generate_demographics()` accept custom product categories and interest lists — defaults are now brand-neutral |
+| Tab order | Reordered to: Setup & Index → Explore Data → Query & Generate for a more natural workflow |
+| Preset queries | Removed Corsair-specific references; presets are now generic behavioral profiles |
+| Demo video | Added `RAG demo.mp4` walkthrough |
+
+**v1 — Streamlit UI (April 2025)**
+
 | Section | Before | After |
 | --- | --- | --- |
 | Key Features | "notebook environment" | Streamlit UI with 3 tabs |
@@ -160,5 +180,3 @@ API key is entered at runtime via the Streamlit sidebar and is never stored in c
 | Tech Stack | Supabase + Google Colab | In-memory store + local Streamlit |
 | Quick Start | *(not present)* | Full install + run instructions added |
 | App Tab Guide | *(not present)* | Setup / Query / Explore tab table added |
-| Limitations | "UI not deployed" | Removed — UI is now live |
-| Dev Notes | Colab constraints | Colab notebook kept for reference |
