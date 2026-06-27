@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Sequential RAG Marketing Engine Architecture</title>
+  <desc id="desc">Architecture diagram showing synthetic marketing data, embeddings, local vector retrieval, optional Supabase production path, prompt orchestration, GPT generation, and Streamlit UI.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f7f9fb; }
+      .title { font: 700 42px Arial, sans-serif; fill: #28465b; }
+      .subtitle { font: 400 20px Arial, sans-serif; fill: #5f7280; }
+      .section { font: 700 16px Arial, sans-serif; letter-spacing: .8px; fill: #ffffff; }
+      .h { font: 700 23px Arial, sans-serif; fill: #28465b; }
+      .small { font: 400 16px Arial, sans-serif; fill: #3f5363; }
+      .tiny { font: 400 14px Arial, sans-serif; fill: #5f7280; }
+      .tag { font: 700 13px Arial, sans-serif; fill: #ffffff; }
+      .box { fill: #ffffff; stroke: #bfd0dc; stroke-width: 2; rx: 14; }
+      .blue { fill: #e7f1fa; stroke: #b9d1e4; }
+      .yellow { fill: #fff3d4; stroke: #f1cd73; }
+      .green { fill: #e8f6ed; stroke: #9ad2aa; }
+      .purple { fill: #f0ecfb; stroke: #c8b8ee; }
+      .gray { fill: #f0f4f7; stroke: #c4d0d9; }
+      .arrow { stroke: #8aa1b2; stroke-width: 6; fill: none; marker-end: url(#arrowhead); }
+      .arrow2 { stroke: #2d9c5a; stroke-width: 5; fill: none; marker-end: url(#arrowgreen); stroke-dasharray: 10 8; }
+      .divider { stroke: #d7e0e7; stroke-width: 2; }
+      .pill-local { fill: #2f7fb8; }
+      .pill-future { fill: #2d9c5a; }
+    </style>
+    <marker id="arrowhead" markerWidth="14" markerHeight="14" refX="11" refY="7" orient="auto">
+      <path d="M 0 0 L 14 7 L 0 14 z" fill="#8aa1b2"/>
+    </marker>
+    <marker id="arrowgreen" markerWidth="14" markerHeight="14" refX="11" refY="7" orient="auto">
+      <path d="M 0 0 L 14 7 L 0 14 z" fill="#2d9c5a"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1600" height="900"/>
+
+  <text x="800" y="82" text-anchor="middle" class="title">Sequential RAG Marketing Engine</text>
+  <text x="800" y="116" text-anchor="middle" class="subtitle">Local portfolio demo today; deployable path with Streamlit Cloud, secrets, and Supabase / CDP integration</text>
+  <line x1="250" y1="145" x2="1350" y2="145" class="divider"/>
+
+  <rect x="58" y="210" width="238" height="405" class="box gray"/>
+  <text x="177" y="247" text-anchor="middle" class="h">Data Inputs</text>
+  <rect x="86" y="273" width="182" height="64" rx="10" fill="#ffffff" stroke="#d6e0e7"/>
+  <text x="177" y="301" text-anchor="middle" class="small">Synthetic profiles</text>
+  <text x="177" y="323" text-anchor="middle" class="tiny">local demo default</text>
+  <rect x="86" y="359" width="182" height="64" rx="10" fill="#ffffff" stroke="#d6e0e7"/>
+  <text x="177" y="387" text-anchor="middle" class="small">Clickstream events</text>
+  <text x="177" y="409" text-anchor="middle" class="tiny">behavior + intent</text>
+  <rect x="86" y="445" width="182" height="64" rx="10" fill="#ffffff" stroke="#d6e0e7"/>
+  <text x="177" y="473" text-anchor="middle" class="small">Brand context</text>
+  <text x="177" y="495" text-anchor="middle" class="tiny">campaign settings</text>
+  <rect x="86" y="531" width="182" height="48" rx="10" fill="#ffffff" stroke="#d6e0e7"/>
+  <text x="177" y="560" text-anchor="middle" class="small">Optional 1P data</text>
+
+  <path d="M 304 412 H 354" class="arrow"/>
+
+  <rect x="370" y="250" width="240" height="322" class="box yellow"/>
+  <text x="490" y="292" text-anchor="middle" class="h">Semantic Prep</text>
+  <text x="490" y="331" text-anchor="middle" class="small">Profile + behavior +</text>
+  <text x="490" y="356" text-anchor="middle" class="small">brand context</text>
+  <line x1="405" y1="383" x2="575" y2="383" stroke="#e0b95f" stroke-width="2"/>
+  <text x="490" y="423" text-anchor="middle" class="tiny">Stringifies marketing records</text>
+  <text x="490" y="449" text-anchor="middle" class="tiny">for embedding and retrieval</text>
+  <rect x="421" y="487" width="138" height="36" rx="18" class="pill-local"/>
+  <text x="490" y="510" text-anchor="middle" class="tag">CURRENT</text>
+
+  <path d="M 618 412 H 668" class="arrow"/>
+
+  <rect x="685" y="250" width="240" height="322" class="box blue"/>
+  <text x="805" y="292" text-anchor="middle" class="h">Embedding Layer</text>
+  <text x="805" y="331" text-anchor="middle" class="small">OpenAI</text>
+  <text x="805" y="356" text-anchor="middle" class="small">text-embedding-3-small</text>
+  <line x1="720" y1="383" x2="890" y2="383" stroke="#9bbbd4" stroke-width="2"/>
+  <circle cx="755" cy="438" r="18" fill="#4c91c9"/>
+  <circle cx="805" cy="418" r="18" fill="#55a95a"/>
+  <circle cx="855" cy="438" r="18" fill="#4c91c9"/>
+  <circle cx="785" cy="485" r="18" fill="#4c91c9"/>
+  <circle cx="835" cy="485" r="18" fill="#55a95a"/>
+  <line x1="755" y1="438" x2="805" y2="418" stroke="#527487" stroke-width="4"/>
+  <line x1="805" y1="418" x2="855" y2="438" stroke="#527487" stroke-width="4"/>
+  <line x1="755" y1="438" x2="785" y2="485" stroke="#527487" stroke-width="4"/>
+  <line x1="855" y1="438" x2="835" y2="485" stroke="#527487" stroke-width="4"/>
+  <line x1="785" y1="485" x2="835" y2="485" stroke="#527487" stroke-width="4"/>
+
+  <path d="M 933 412 H 983" class="arrow"/>
+
+  <rect x="1000" y="215" width="245" height="250" class="box green"/>
+  <text x="1122" y="257" text-anchor="middle" class="h">Retrieval Store</text>
+  <rect x="1035" y="283" width="175" height="38" rx="19" class="pill-local"/>
+  <text x="1122" y="307" text-anchor="middle" class="tag">CURRENT LOCAL DEMO</text>
+  <text x="1122" y="354" text-anchor="middle" class="small">NumPy in-memory</text>
+  <text x="1122" y="381" text-anchor="middle" class="small">cosine similarity</text>
+  <text x="1122" y="424" text-anchor="middle" class="tiny">Fast to run locally;</text>
+  <text x="1122" y="446" text-anchor="middle" class="tiny">no external database required</text>
+
+  <rect x="1000" y="505" width="245" height="205" class="box green"/>
+  <text x="1122" y="547" text-anchor="middle" class="h">Deployable Path</text>
+  <rect x="1034" y="573" width="176" height="38" rx="19" class="pill-future"/>
+  <text x="1122" y="597" text-anchor="middle" class="tag">FUTURE / PRODUCTION</text>
+  <text x="1122" y="641" text-anchor="middle" class="small">Supabase pgvector</text>
+  <text x="1122" y="667" text-anchor="middle" class="small">or CDP / warehouse</text>
+  <text x="1122" y="696" text-anchor="middle" class="tiny">with auth, secrets, logging</text>
+
+  <path d="M 1254 340 H 1305" class="arrow"/>
+  <path d="M 1254 607 C 1290 607 1298 470 1308 421" class="arrow2"/>
+
+  <rect x="1322" y="250" width="220" height="322" class="box purple"/>
+  <text x="1432" y="292" text-anchor="middle" class="h">RAG Output</text>
+  <text x="1432" y="331" text-anchor="middle" class="small">Prompt orchestration</text>
+  <text x="1432" y="357" text-anchor="middle" class="small">+ GPT-4o generation</text>
+  <line x1="1354" y1="383" x2="1510" y2="383" stroke="#b7a6df" stroke-width="2"/>
+  <text x="1432" y="423" text-anchor="middle" class="tiny">Audience insight</text>
+  <text x="1432" y="451" text-anchor="middle" class="tiny">Campaign recommendation</text>
+  <text x="1432" y="479" text-anchor="middle" class="tiny">Personalized copy</text>
+  <rect x="1364" y="515" width="136" height="36" rx="18" fill="#7b64c8"/>
+  <text x="1432" y="538" text-anchor="middle" class="tag">STREAMLIT UI</text>
+
+  <rect x="148" y="660" width="862" height="72" rx="14" fill="#2d9c5a"/>
+  <text x="579" y="704" text-anchor="middle" class="section">REAL-TIME CONTEXT + INTENT AWARENESS</text>
+
+  <path d="M 280 780 H 520" class="arrow"/>
+  <path d="M 620 780 H 860" class="arrow"/>
+  <path d="M 960 780 H 1200" class="arrow"/>
+  <text x="176" y="788" class="h">Data</text>
+  <text x="545" y="788" class="h">Semantic Retrieval</text>
+  <text x="890" y="788" class="h">RAG Output</text>
+  <text x="1230" y="788" class="h">Review in Streamlit</text>
+
+  <text x="800" y="852" text-anchor="middle" class="tiny">Current repo: local Streamlit app with synthetic data and local API-key handling. Production option: hosted Streamlit with secrets, usage controls, Supabase pgvector, and governed first-party data integration.</text>
+</svg>
