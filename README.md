@@ -1,6 +1,6 @@
 # Sequential RAG Marketing Engine
 
-A local Streamlit prototype that uses synthetic customer behavior data, OpenAI embeddings, in-memory retrieval, and GPT-4o generation to explore audience insights and campaign recommendations.
+A Streamlit prototype that uses synthetic customer behavior data, OpenAI embeddings, in-memory retrieval, and GPT-4o generation to explore audience insights and campaign recommendations.
 
 ## Why This Matters
 
@@ -10,7 +10,7 @@ Marketing teams often get trapped between two incomplete targeting approaches: s
 
 Video walkthrough: [YouTube demo](https://www.youtube.com/watch?v=Q7uzjmP-3u0)
 
-This repo is designed for local review today. A hosted Streamlit version is planned after adding safe API-key handling, access controls, and usage limits.
+The app is cloud-ready: API keys load from Streamlit secrets and a password gate protects hosted usage. A password-gated live demo on Streamlit Community Cloud is the next step — the link and access password are shared in applications and interviews once live. Until then, the app runs locally in two minutes (see [Run Locally](#run-locally)).
 
 ## What It Does
 
@@ -57,21 +57,23 @@ flowchart LR
     N --> O
 ```
 
+**Note on the current single-store design.** The prototype vectorizes demographic and clickstream signals into one combined store for retrieval simplicity. For production, a two-store split (static demographics + rolling clickstream window) is a cleaner architecture — see Roadmap item 4 for the rationale.
+
 ## Workflow
 
-1. **Prepare synthetic marketing data**  
+1. **Prepare synthetic marketing data**
    Customer profiles, behavioral records, and campaign context are generated into a format suitable for retrieval.
 
-2. **Create embeddings**  
+2. **Create embeddings**
    Records are embedded with `text-embedding-3-small` so semantically similar audience signals can be retrieved even when exact keywords do not match.
 
-3. **Retrieve relevant context**  
+3. **Retrieve relevant context**
    A user question triggers cosine-similarity retrieval from the in-memory vector store.
 
-4. **Generate insight and copy**  
+4. **Generate insight and copy**
    GPT-4o receives the user question plus retrieved context and generates marketing-oriented recommendations or copy.
 
-5. **Explore recommendations**  
+5. **Explore recommendations**
    The Streamlit UI makes the workflow accessible for non-technical marketing users.
 
 ## Product Thinking
@@ -96,29 +98,35 @@ Current limitations:
 - No production CDP or warehouse ingestion.
 - No prompt versioning.
 - No automated evaluation loop.
+- No constraint-validation layer.
+- No source-signal transparency at output time.
 - No channel-specific output variants yet.
 - No live activation into marketing platforms.
 
 ## Roadmap: Named Production Gaps
 
-Four production gaps stand between this prototype and operator-grade tooling for an LLM-in-marketing stack. Each roadmap item below addresses a specific gap that AI-platform reviewers may probe for.
+Seven gaps stand between this prototype and operator-grade tooling for an LLM-in-marketing stack. Each roadmap item below addresses a specific gap that AI-platform reviewers may probe for. Items 1 through 4 close named production gaps; items 5 and 6 broaden output trust and cold-start behavior; item 7 broadens who can use the system once those gaps are closed.
 
-1. **Prompt versioning addresses stochastic-output drift.**  
+1. **Prompt versioning addresses stochastic-output drift.**
    Store prompts as versioned artifacts; route a percentage of generation requests through experimental templates; log outputs for comparison. This lets a marketing team iterate on tone and structure without redeploying, and surfaces when output quality silently degrades after a change.
 
-2. **Evaluation loop addresses lack of regression testing.**  
-   Pair LLM-as-judge scoring for output quality, brand-voice adherence, factual grounding, and marketing usefulness with periodic human spot checks. This catches retrieval-relevance regressions before they reach campaigns.
+2. **Evaluation loop plus constraint-validation addresses lack of regression testing AND unsafe outputs.**
+   Two layers, not one. First, LLM-as-judge scoring for output quality, brand-voice adherence, factual grounding, and marketing usefulness, paired with periodic human spot checks. Second, a *constraint-validation layer* — natural-language rules ("no competitor names in generated copy"; "audience size must be 100 to 5M"; "no restricted terms per brand policy") checked by a **separate AI system** against every generation before it reaches the marketer. The second layer catches unsafe outputs faster than an eval-loop-only design.
 
-3. **Channel-specific output variants address format heterogeneity across channels.**  
+3. **Channel-specific output variants address format heterogeneity across channels.**
    Use the same retrieved context, then generate variants for email subject lines, SMS, landing pages, lifecycle messages, and sales enablement snippets. Today's single-output design assumes channel-agnostic copy, which is the exception, not the rule.
 
-4. **Live CDP / warehouse ingestion addresses stale audience data.**  
-   Replace the synthetic generator with a Segment/Rudderstack-shaped event stream consumer, paired with a persistent vector store such as Supabase, Pinecone, or pgvector. The embedding index should update as users behave, not only when the app restarts.
+4. **Live CDP ingestion plus two-store architecture addresses stale audience data AND recompute cost.**
+   Two changes together, not one. First, replace the synthetic generator with a Segment / Rudderstack-shaped event stream consumer, paired with a persistent vector store such as Supabase, Pinecone, or pgvector. Second, split into a **static demographic store** (refreshed quarterly) plus a **rolling 90-day clickstream store** (refreshed daily). This decoupling lets each store update at its natural cadence and avoids the recompute cost of re-vectorizing the whole user profile whenever behavior changes. The 90-day window aligns with a publicly reported finding from Meta's Analytics Agent case study — 88% of internal analyst queries hit tables from the preceding 90 days — as one supporting data point for the recency bet.
 
-5. **Role-based interface broadens operator accessibility.**  
+5. **Source-signal transparency addresses output-trust erosion.**
+   Every generation should surface *what shaped it*: which retrieved users, which behavioral patterns, and which brand-context inputs went into the prompt. Surfacing the retrieved user profiles and dominant clickstream signals alongside each generated persona or recommendation lets a marketer steer, verify, or reuse rather than take output on faith.
+
+6. **Reference marketers as few-shot exemplars address cold-start weakness.**
+   Naming reference marketers — for example, a senior PMM whose past segmentation choices seed the retrieval for a new marketer working on the same brand — creates a bottom-up personalization layer (individual retrieval history) on top of the top-down brand-context layer already in place. This shortens ramp-up for a new marketer joining an existing brand workflow.
+
+7. **Role-based interface broadens operator accessibility.**
    Adapt views for growth marketers, lifecycle marketers, product marketing, and marketing operations. Today's UI assumes a single power-user persona.
-
-Items 1 through 4 close named production gaps. Item 5 broadens who can use the system once those gaps are closed.
 
 ## Tech Stack
 
@@ -127,8 +135,8 @@ Items 1 through 4 close named production gaps. Item 5 broadens who can use the s
 - **Generation:** OpenAI `gpt-4o`
 - **Vector store:** NumPy in-memory cosine similarity; resets on app restart (see Roadmap item 4)
 - **Data:** Synthetic clickstream + demographics generator; no Kaggle account or CDP required
-- **Local config:** `python-dotenv` for local API-key handling
-- **Deployment target:** Streamlit Community Cloud, planned with secrets, password gate, and usage limits
+- **Config:** `python-dotenv` for local API-key handling; `st.secrets` for hosted deployment
+- **Deployment:** Streamlit Community Cloud-ready — secrets-managed API key + optional password gate (set `APP_PASSWORD` in secrets to enable)
 
 ## Built with AI Assistance
 
@@ -165,8 +173,8 @@ The collaborative workflow itself reflects how marketing teams can realistically
 ## Run Locally
 
 ```bash
-git clone https://github.com/sunnyskydream/Sequential-RAG-Marketing-Engine.git
-cd Sequential-RAG-Marketing-Engine
+git clone https://github.com/sunnyskydream/sequential-rag-marketing-engine.git
+cd sequential-rag-marketing-engine
 pip install -r requirements.txt
 streamlit run app.py
 ```

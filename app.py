@@ -15,6 +15,17 @@ from openai import OpenAI
 
 load_dotenv()  # picks up OPENAI_API_KEY from a local .env file if present
 
+
+def get_secret(name: str) -> str:
+    """Read a secret from st.secrets (Streamlit Cloud) or environment (local .env)."""
+    try:
+        if name in st.secrets:
+            return str(st.secrets[name])
+    except Exception:
+        pass  # no secrets.toml locally — fall through to env
+    return os.environ.get(name, "")
+
+
 from rag_engine import (
     InMemoryVectorStore,
     build_vector_store,
@@ -34,6 +45,22 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# ── Access gate (only active when APP_PASSWORD is set in Streamlit secrets) ──
+
+_app_password = get_secret("APP_PASSWORD")
+if _app_password and not st.session_state.get("auth_ok", False):
+    st.title("🔒 Sequential RAG Marketing Engine")
+    st.caption("This demo is password-gated to protect API usage. The password is shared alongside the demo link.")
+    with st.form("access_gate"):
+        pw = st.text_input("Access password", type="password")
+        if st.form_submit_button("Enter"):
+            if pw == _app_password:
+                st.session_state["auth_ok"] = True
+                st.rerun()
+            else:
+                st.error("Incorrect password.")
+    st.stop()
+
 # ── Session state ─────────────────────────────────────────────────────────────
 
 for key in ("vector_store", "context_df", "demographics_df", "clickstream_df"):
@@ -47,13 +74,21 @@ with st.sidebar:
     st.caption("Personalized marketing copy via behavior-aware RAG")
     st.divider()
 
+    _has_server_key = bool(get_secret("OPENAI_API_KEY"))
     api_key = st.text_input(
-        "OpenAI API Key",
-        value=os.environ.get("OPENAI_API_KEY", ""),
+        "OpenAI API Key" + (" (optional)" if _has_server_key else ""),
+        value="",
         type="password",
-        placeholder="sk-...",
-        help="Set OPENAI_API_KEY in a local .env file, or paste it here. Never committed to git.",
+        placeholder="sk-..." if not _has_server_key else "Using app's configured key",
+        help=(
+            "Leave blank to use this app's configured key."
+            if _has_server_key
+            else "Set OPENAI_API_KEY in a local .env file, or paste it here. Never committed to git."
+        ),
     )
+    # Server-side key is never sent to the browser — only used inside make_client().
+    if not api_key and _has_server_key:
+        api_key = get_secret("OPENAI_API_KEY")
 
     st.divider()
     st.markdown("#### Brand Configuration")
