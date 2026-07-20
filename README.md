@@ -10,7 +10,7 @@ Marketing teams often get trapped between two incomplete targeting approaches: s
 
 Video walkthrough: [YouTube demo](https://www.youtube.com/watch?v=Q7uzjmP-3u0)
 
-The app is cloud-ready: API keys load from Streamlit secrets and a password gate protects hosted usage. A password-gated live demo on Streamlit Community Cloud is the next step — the link and access password are shared in applications and interviews once live. Until then, the app runs locally in two minutes (see [Run Locally](#run-locally)).
+**Live demo:** [sequential-rag-marketing-engine.streamlit.app](https://sequential-rag-marketing-engine-ksuzuwyqhobpdpesvpnxjp.streamlit.app/) — password-gated to protect API usage; the access password is shared in applications and interviews. You can also run the app locally in two minutes (see [Run Locally](#run-locally)).
 
 ## What It Does
 
@@ -136,7 +136,7 @@ Seven gaps stand between this prototype and operator-grade tooling for an LLM-in
 - **Vector store:** NumPy in-memory cosine similarity; resets on app restart (see Roadmap item 4)
 - **Data:** Synthetic clickstream + demographics generator; no Kaggle account or CDP required
 - **Config:** `python-dotenv` for local API-key handling; `st.secrets` for hosted deployment
-- **Deployment:** Streamlit Community Cloud-ready — secrets-managed API key + optional password gate (set `APP_PASSWORD` in secrets to enable)
+- **Deployment:** Streamlit Community Cloud — secrets-managed API key + password gate (`APP_PASSWORD` in secrets)
 
 ## Built with AI Assistance
 
