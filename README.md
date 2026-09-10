@@ -16,11 +16,11 @@ Marketing teams often get trapped between two incomplete targeting approaches: s
 
 ## Walkthrough
 
-**Live demo:** [sequential-rag-marketing-engine.streamlit.app](https://sequential-rag-marketing-engine-ksuzuwyqhobpdpesvpnxjp.streamlit.app/) — password-gated to protect API usage; the access password is shared in applications and interviews. You can also run the app locally in two minutes (see [Run Locally](#run-locally)).
+**Video walkthrough (no API key required):** [Watch the complete demo on YouTube](https://www.youtube.com/watch?v=Q7uzjmP-3u0).
+
+**Live demo:** [sequential-rag-marketing-engine.streamlit.app](https://sequential-rag-marketing-engine-ksuzuwyqhobpdpesvpnxjp.streamlit.app/) — openly reachable. Bring your own OpenAI API key to build the vector index and generate content; the app has no shared server-side key. You can also run it locally in two minutes (see [Run Locally](#run-locally)).
 
 ![Generating personalized marketing copy from retrieved audience context](assets/demo-content-generation.png)
-
-Video walkthrough: [YouTube demo](https://www.youtube.com/watch?v=Q7uzjmP-3u0)
 
 ## What It Does
 
@@ -134,8 +134,8 @@ Full rationale, design sketches, and trade-offs for each item: **[docs/roadmap.m
 - **Generation:** OpenAI `gpt-4o`
 - **Vector store:** NumPy in-memory cosine similarity; resets on app restart (see Roadmap item 4)
 - **Data:** Synthetic clickstream + demographics generator; no Kaggle account or CDP required
-- **Config:** `python-dotenv` for local API-key handling; `st.secrets` for hosted deployment
-- **Deployment:** Streamlit Community Cloud — secrets-managed API key + password gate (`APP_PASSWORD` in secrets)
+- **Config:** bring-your-own OpenAI API key entered in the Streamlit sidebar
+- **Deployment:** Streamlit Community Cloud — open UI with no password gate and no shared server-side API key
 
 ## Ownership and AI Assistance
 
@@ -178,13 +178,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Set your OpenAI API key locally before running:
-
-```bash
-OPENAI_API_KEY=your_api_key_here
-```
-
-You can also paste the key into the Streamlit sidebar during local testing. Do not commit API keys to GitHub.
+Paste your OpenAI API key into the Streamlit sidebar when you want to build the index or generate content. The key is used only for that session; do not commit API keys to GitHub.
 
 ## Notes
 
