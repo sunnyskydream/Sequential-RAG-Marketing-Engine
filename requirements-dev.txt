@@ -1,0 +1,9 @@
+# Development and test dependencies only.
+# The Streamlit runtime needs nothing in this file — see requirements.txt.
+#
+#   python -m pip install -r requirements-dev.txt
+#   python -m pytest
+
+-r requirements.txt
+
+pytest>=8.0.0

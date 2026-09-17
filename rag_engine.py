@@ -131,15 +131,14 @@ def stringify_user_context(
     subject, possessive = _PRONOUNS.get(demo["gender"], ("They", "their"))
     stage_desc = _STAGE_DESCRIPTIONS.get(click_row["journey_stage"], "browsing the site")
 
-    ts = click_row["timestamp"]
-    ts_str = ts.strftime("%Y-%m-%d %H:%M:%S") if hasattr(ts, "strftime") else str(ts)
+    duration_s = int(click_row["session_duration_s"])
 
     return (
         f"This is a {demo['age']}-year-old {demo['gender']} living in {demo['location']} "
         f"with a primary interest in {demo['primary_interest']} "
         f"and a {demo['annual_income']} income level. "
         f"{subject} is currently using a {click_row['device_type']} device and has been "
-        f"on this step for approximately {ts_str} seconds. "
+        f"on this step for approximately {duration_s} seconds. "
         f"Based on {possessive} behavior pattern, {subject.lower()} is {stage_desc}."
     )
 

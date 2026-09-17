@@ -212,14 +212,14 @@ with tab_query:
                 "This is a 38-year-old Male living in New York "
                 "with a primary interest in Lifestyle and a Low income level. "
                 "He is currently using a Mobile device and has been on this step "
-                "for approximately 2025-03-31 11:11:46 seconds. "
+                "for approximately 143 seconds. "
                 "Based on his behavior pattern, he is in the early exploration stage of product discovery."
             ),
             "Consideration Stage — Desktop, Medium income": (
                 "This is a 29-year-old Male living in California "
                 "with a primary interest in Tech and a Medium income level. "
                 "He is currently using a Desktop device and has been on this step "
-                "for approximately 2025-04-10 20:45:12 seconds. "
+                "for approximately 412 seconds. "
                 "Based on his behavior pattern, he is comparing multiple products and reviewing "
                 "detailed specifications, indicating a mid-to-high purchase intent."
             ),
@@ -227,7 +227,7 @@ with tab_query:
                 "This is a 42-year-old Female living in Texas "
                 "with a primary interest in Professional use and a High income level. "
                 "She is currently using a Desktop device and has been on this step "
-                "for approximately 2025-05-18 09:32:55 seconds. "
+                "for approximately 968 seconds. "
                 "Based on her behavior pattern, she has revisited the same product multiple times "
                 "and is checking pricing and reviews, indicating strong purchase intent."
             ),
@@ -235,14 +235,14 @@ with tab_query:
                 "This is a 40-year-old Female living in San Francisco "
                 "with a primary interest in Professional use and an Ultra High income level. "
                 "She is currently using a Tablet device and has been on this step "
-                "for approximately 2025-02-26 12:57:10 seconds. "
+                "for approximately 187 seconds. "
                 "Based on her behavior pattern, she is in the early exploration stage of product discovery."
             ),
             "Enthusiast — Desktop, High income, Conversion-ready": (
                 "This is a 24-year-old Male living in Seattle "
                 "with a primary interest in Fitness and a High income level. "
                 "He is currently using a Desktop device and has been on this step "
-                "for approximately 2025-06-05 18:22:33 seconds. "
+                "for approximately 1247 seconds. "
                 "Based on his behavior pattern, he is completing a purchase transaction, "
                 "showing high conversion readiness."
             ),
