@@ -1,5 +1,7 @@
 # Sequential RAG Marketing Engine
 
+[![tests](https://github.com/sunnyskydream/Sequential-RAG-Marketing-Engine/actions/workflows/tests.yml/badge.svg)](https://github.com/sunnyskydream/Sequential-RAG-Marketing-Engine/actions/workflows/tests.yml)
+
 A Streamlit prototype that uses synthetic customer behavior data, OpenAI embeddings, in-memory retrieval, and GPT-4o generation to explore audience insights and campaign recommendations.
 
 ## Why This Matters
