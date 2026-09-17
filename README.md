@@ -22,6 +22,8 @@ Marketing teams often get trapped between two incomplete targeting approaches: s
 
 ![Generating personalized marketing copy from retrieved audience context](assets/demo-content-generation.png)
 
+The demo retrieves the closest-matching profiles and shows each with its similarity score and matched context. Copy is generated for the top match; the remaining matches display their context only.
+
 ## What It Does
 
 - Ingests synthetic customer profiles and behavioral events; users can adapt brand, audience, and campaign context through the sidebar.
@@ -67,7 +69,9 @@ flowchart LR
     N --> O
 ```
 
-**Note on the current single-store design.** The prototype vectorizes demographic and clickstream signals into one combined store for retrieval simplicity. For production, a two-store split (static demographics + rolling clickstream window) is a cleaner architecture — see Roadmap item 4 for the rationale.
+**Note on the current single-store design.** The prototype vectorizes demographic and clickstream signals into one combined store for retrieval simplicity. For production, a two-store split (static demographics + rolling clickstream window) is a cleaner architecture — see Roadmap item 5 for the rationale.
+
+**Target architecture.** The loop this prototype is designed toward — profile store, semantic layer, versioned prompts, governed generation, channel delivery, and outcome feedback — is drawn in [docs/architecture-vision.md](docs/architecture-vision.md), with each stage marked *implemented today* or *designed, not built*.
 
 ## Workflow
 
@@ -106,6 +110,8 @@ Current limitations:
 - OpenAI-oriented implementation.
 - Synthetic data only by default.
 - No production CDP or warehouse ingestion.
+- No unified semantic layer: retrieved profiles are not categorized into named, reusable segments.
+- Generation runs for the top-matching profile only, not for every retrieved match.
 - No prompt versioning.
 - No automated evaluation loop.
 - No constraint-validation layer.
@@ -115,24 +121,37 @@ Current limitations:
 
 ## Roadmap: Named Production Gaps
 
-Seven gaps stand between this prototype and operator-grade tooling for an LLM-in-marketing stack. Each item names the specific production gap it closes:
+Nine selected product and measurement gaps stand between this prototype and operator-grade tooling for an LLM-in-marketing stack, numbered by conceptual validity dependency rather than implementation order, and grouped by what each requires.
 
-1. **Prompt versioning** → stochastic-output drift
-2. **Evaluation loop + constraint-validation** → lack of regression testing and unsafe outputs
-3. **Channel-specific output variants** → format heterogeneity across channels
-4. **Live CDP ingestion + two-store architecture** → stale audience data and recompute cost
-5. **Source-signal transparency** → output-trust erosion
-6. **Reference marketers as few-shot exemplars** → cold-start weakness
-7. **Role-based interface** → single-persona accessibility ceiling
+**The dependency claim:** prompt and run provenance should be recorded from the first generation, because an unlogged run cannot be reconstructed afterwards. Stable segments are not required for logging or for validating a single output; they are required to interpret comparisons across prompt versions. If "high intent" changes definition between two runs, a difference in output cannot be attributed to the prompt. Generation is per person; comparative evaluation is per cohort; the semantic layer provides the versioned cohort definition that makes that comparison valid.
 
-Full rationale, design sketches, and trade-offs for each item: **[docs/roadmap.md](docs/roadmap.md)**.
+**Tier 1 — buildable on synthetic data**
+
+1. **Unified semantic layer** → uninterpretable comparison. Named, marketer-adjustable segments as the unit of *comparative* evaluation.
+2. **Prompt and run versioning** → stochastic-output drift. Starts first in implementation order: an immutable prompt-version ID or content hash, with segment, model, parameters, retrieval context and constraint versions recorded in the run record. Worked A/B examples in the full roadmap.
+3. **Evaluation loop plus constraint validation** → missing regression testing and unsafe output. A deterministic validator that blocks, and an independent LLM-as-judge that scores.
+4. **Per-match generation and input transparency** → output-trust erosion. Partly closed: matches and similarity scores are already surfaced.
+
+**Tier 2 — requires real data or real users**
+
+5. **Live CDP ingestion plus two-store architecture** → stale audience data and recompute cost.
+6. **Cross-channel graph signal** → single-channel myopia.
+7. **Outcome feedback into the profile** → an open loop.
+8. **Reference marketers as few-shot exemplars** → cold-start weakness.
+9. **Role-based interface** → single-persona accessibility ceiling.
+
+**Operational foundations** — run ledger, privacy and retention, access control, injection defences, monitoring, model migration, fallback and rollback — are named in the full roadmap and are not built here.
+
+**Deliberately not pursued yet:** channel-specific output variants. A variant's worth is whether it performs in its channel, and honest testing needs real delivery and real outcomes — which depends on items 5 and 7.
+
+Full rationale, worked A/B examples, design sketches, and trade-offs: **[docs/roadmap.md](docs/roadmap.md)**.
 
 ## Tech Stack
 
 - **Language & UI:** Python, Streamlit
 - **Embeddings:** OpenAI `text-embedding-3-small`
 - **Generation:** OpenAI `gpt-4o`
-- **Vector store:** NumPy in-memory cosine similarity; resets on app restart (see Roadmap item 4)
+- **Vector store:** NumPy in-memory cosine similarity; resets on app restart (see Roadmap item 5)
 - **Data:** Synthetic clickstream + demographics generator; no Kaggle account or CDP required
 - **Config:** bring-your-own OpenAI API key entered in the Streamlit sidebar
 - **Deployment:** Streamlit Community Cloud — open UI with no password gate and no shared server-side API key
@@ -148,14 +167,22 @@ I designed the system architecture, prompt strategy, workflow orchestration, ret
 | **Claude (Anthropic)** | Refactoring into a local Streamlit app, brand-agnostic generalization, and code quality |
 | **Codex** | README calibration, public-portfolio framing, and architecture diagram cleanup |
 
+This project began as a Colab notebook prototype built on a Kaggle dataset and a Supabase vector store. The Streamlit application in this repository is the canonical implementation; the original prototype was removed to keep one source of truth and remains available in the git history.
+
 ## Repository Structure
 
 ```text
 .
+|-- .github/
+|   `-- workflows/
+|       `-- tests.yml
 |-- app.py
 |-- rag_engine.py
 |-- docs/
+|   |-- architecture-vision.md
 |   `-- roadmap.md
+|-- tests/
+|   `-- test_rag_engine.py
 |-- assets/
 |   |-- architecture_codex.svg
 |   |-- demo-setup.png
@@ -165,7 +192,7 @@ I designed the system architecture, prompt strategy, workflow orchestration, ret
 |   |-- demo-semantic-context.png
 |   `-- demo-content-generation.png
 |-- requirements.txt
-|-- Sequential_RAG_Marketing_Engine.ipynb
+|-- requirements-dev.txt
 `-- README.md
 ```
 
